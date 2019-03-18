@@ -21,9 +21,9 @@ namespace LocationTest.Droid
     public class MainActivity : global::Xamarin.Forms.Platform.Android.FormsAppCompatActivity
     {
         FusedLocationProviderClient fusedLocationProviderClient;
-        bool _errythingOk;       
-	
-MyLocationCallback locationCallback;
+        bool _errythingOk;
+
+        MyLocationCallback locationCallback;
         FusedLocationProviderClient client;
 
         async Task StartLocationUpdatesAsync()
@@ -57,9 +57,7 @@ MyLocationCallback locationCallback;
                 {
                     while (!AccesToFineLocation())
                     {
-                        ActivityCompat.RequestPermissions(this,
-         new string[] { Manifest.Permission.AccessFineLocation },
-         1);
+                        ActivityCompat.RequestPermissions(this,new string[] { Manifest.Permission.AccessFineLocation },1);
                     }
                     var locationRequest = new LocationRequest()
                                          .SetInterval(10000)
@@ -80,29 +78,14 @@ MyLocationCallback locationCallback;
             ToolbarResource = Resource.Layout.Toolbar;
 
             base.OnCreate(savedInstanceState);
-            _errythingOk = IsGooglePlayServicesInstalled()&&AccesToFineLocation();
+            _errythingOk = IsGooglePlayServicesInstalled() && AccesToFineLocation();
             fusedLocationProviderClient = LocationServices.GetFusedLocationProviderClient(this);
-           Task locationUpdate = StartLocationUpdatesAsync();
-           // GetLastLocationFromDevice().Wait();
+            Task locationUpdate = StartLocationUpdatesAsync();
             global::Xamarin.Forms.Forms.Init(this, savedInstanceState);
             LoadApplication(new App());
         }
-        //async Task GetLastLocationFromDevice()
-        //{
 
-        //    Android.Locations.Location location = await fusedLocationProviderClient.GetLastLocationAsync();
-
-        //    if (location == null)
-        //    {
-        //        // Seldom happens, but should code that handles this scenario
-        //    }
-        //    else
-        //    {
-        //        // Do something with the location 
-        //        Log.Debug("Sample", "The latitude is " + location.Latitude);
-        //    }
-        //}
-        bool AccesToFineLocation()
+        private bool AccesToFineLocation()
         {
             if (ContextCompat.CheckSelfPermission(this, Manifest.Permission.AccessFineLocation) == Permission.Granted)
             {
@@ -111,7 +94,7 @@ MyLocationCallback locationCallback;
             else
             {
                 // The app does not have permission ACCESS_FINE_LOCATION 
-               
+
 
                 return false;
             }
@@ -137,6 +120,11 @@ MyLocationCallback locationCallback;
 
             return false;
         }
+        /// <summary>
+        /// Event happens on location update
+        /// </summary>
+        /// <param name="sender"></param>
+        /// <param name="location"></param>
         void OnLocationResult(object sender, Location location)
         {
             //location.Latitude;
