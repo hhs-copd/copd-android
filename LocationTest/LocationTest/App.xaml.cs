@@ -1,5 +1,4 @@
-﻿using System;
-using Xamarin.Forms;
+﻿using Xamarin.Forms;
 using Xamarin.Forms.Xaml;
 
 [assembly: XamlCompilation(XamlCompilationOptions.Compile)]
@@ -9,9 +8,18 @@ namespace LocationTest
     {
         public App()
         {
-            InitializeComponent();
+            this.InitializeComponent();
+            this.MainPage = new MainPage();
+        }
 
-            MainPage = new MainPage();
+        public App(ISignInViewModel signInViewModel)
+        {
+            this.InitializeComponent();
+
+            this.MainPage = new MainPage
+            {
+                BindingContext = signInViewModel
+            };
         }
 
         protected override void OnStart()

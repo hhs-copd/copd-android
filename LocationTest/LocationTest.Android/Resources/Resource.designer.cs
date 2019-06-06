@@ -26,6 +26,8 @@ namespace LocationTest.Droid
 		
 		public static void UpdateIdValues()
 		{
+			global::Auth0.OidcClient.Resource.String.ApplicationName = global::LocationTest.Droid.Resource.String.ApplicationName;
+			global::Auth0.OidcClient.Resource.String.Hello = global::LocationTest.Droid.Resource.String.Hello;
 			global::Xamarin.Forms.Platform.Android.Resource.Attribute.actionBarSize = global::LocationTest.Droid.Resource.Attribute.actionBarSize;
 		}
 		
@@ -4099,6 +4101,12 @@ namespace LocationTest.Droid
 		
 		public partial class String
 		{
+			
+			// aapt resource value: 0x7f09004e
+			public const int ApplicationName = 2131296334;
+			
+			// aapt resource value: 0x7f09004d
+			public const int Hello = 2131296333;
 			
 			// aapt resource value: 0x7f090026
 			public const int abc_action_bar_home_description = 2131296294;
