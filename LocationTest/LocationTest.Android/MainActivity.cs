@@ -146,13 +146,17 @@ namespace LocationTest.Droid
                            
                             read.ValueUpdated += (o, args) =>
                             {
-                                
-                                    byte[] bytes = read.Value;
+                                byte[] bytes = read.Value;
+                                if (read.StringValue.Contains("end"))
+                                {                                    
                                     langDing.AddRange(bytes);
-                                File.Delete("foo.CSV");
-                                    File.WriteAllBytes("/storage/emulated/0/Android/data/com.COPDDDDeluxe.app/files/foo.CSV", langDing.ToArray());
-                                
-                                
+                                    File.WriteAllBytes("/storage/emulated/0/android/data/com.companyname.LocationTest.Android/files/foo"+
+                                    System.DateTime.Now.ToString("MM-dd-hh-mm-ss")+".CSV", langDing.ToArray());
+                                    langDing.Clear();
+                                }
+                                    
+                                    langDing.AddRange(bytes);
+
                             };
                             await read.StartUpdatesAsync();
 
