@@ -36,14 +36,15 @@ namespace LocationTest.Droid
         {
             string[] requiredPermissions = new[]
             {
+                Manifest.Permission.Bluetooth,
                 Manifest.Permission.BluetoothAdmin,
-                Manifest.Permission.WriteExternalStorage,
-                Manifest.Permission.AccessWifiState
+                Manifest.Permission.AccessWifiState,
+                Manifest.Permission.AccessFineLocation
             };
 
-            while (requiredPermissions.Any(permission => ContextCompat.CheckSelfPermission(this, permission) == Permission.Denied))
+            while (requiredPermissions.Any(permission => ContextCompat.CheckSelfPermission(this, permission) != Permission.Granted))
             {
-                IEnumerable<string> unmatchedPermissions = requiredPermissions.Where(permission => ContextCompat.CheckSelfPermission(this, permission) == Permission.Denied);
+                IEnumerable<string> unmatchedPermissions = requiredPermissions.Where(permission => ContextCompat.CheckSelfPermission(this, permission) != Permission.Granted);
                 foreach (string permission in unmatchedPermissions)
                 {
                     ActivityCompat.RequestPermissions(this, new string[] { permission }, 1);
@@ -53,30 +54,31 @@ namespace LocationTest.Droid
         }
         protected override void OnCreate(Bundle savedInstanceState)
         {
+
+            base.OnCreate(savedInstanceState);
+            this.IsGooglePlayServicesInstalled();
+            this.RequestPermissions();
+            Xamarin.Forms.Forms.Init(this, savedInstanceState);
+            this.LoadApplication(new App());
             IBluetoothLE bluetooth = CrossBluetoothLE.Current;
             this._adapter = bluetooth.Adapter;
             bluetooth.StateChanged += this.BluetoothStateChanged;
-
-            bluetooth.Adapter.DeviceDiscovered += this._adapter_DeviceDiscovered;
-            bluetooth.Adapter.ScanMode = ScanMode.Balanced;
-            Task scan = bluetooth.Adapter.StartScanningForDevicesAsync();
+            _adapter.DeviceDiscovered += this._adapter_DeviceDiscovered;
+            _adapter.ScanMode = ScanMode.Balanced;
+            Task scan = _adapter.StartScanningForDevicesAsync();
 
             TabLayoutResource = Resource.Layout.Tabbar;
             ToolbarResource = Resource.Layout.Toolbar;
 
-            base.OnCreate(savedInstanceState);
 
-            this.IsGooglePlayServicesInstalled();
-            this.RequestPermissions();
 
-            Xamarin.Forms.Forms.Init(this, savedInstanceState);
-            this.LoadApplication(new App());
+
+
         }
 
         private async void _adapter_DeviceDiscovered(object sender, DeviceEventArgs e)
         {
             const string filePath = "/storage/emulated/0/android/data/com.companyname.LocationTest.Android/files/foo";
-            const string uuid = "6e400001-b5a3-f393-e0a9-e50e24dcca9e";
             string[] allowedDevices = { "CA:81:BA:4B:DC:02", "E2:4D:DB:60:C0:6B" };
 
             try
@@ -94,12 +96,12 @@ namespace LocationTest.Droid
                     IList<IService> services = await dev.GetServicesAsync();
                     this.devices.Add(dev, services);
 
-                    IService relevantService = services.FirstOrDefault(x => x.Id.Equals(Guid.Parse(uuid)));
+                    IService relevantService = services.FirstOrDefault(x => x.Id.Equals(Guid.Parse("6e400001-b5a3-f393-e0a9-e50e24dcca9e")));
                     IList<ICharacteristic> characteristics = await relevantService.GetCharacteristicsAsync();
                     this.servicesWithCharacteristics.Add(Tuple.Create(dev, relevantService), characteristics);
 
-                    ICharacteristic read = characteristics.FirstOrDefault(c => c.Uuid == uuid);
-                    ICharacteristic write = characteristics.FirstOrDefault(c => c.Uuid == uuid);
+                    ICharacteristic read = characteristics.FirstOrDefault(c => c.Uuid == "6e400003-b5a3-f393-e0a9-e50e24dcca9e");
+                    ICharacteristic write = characteristics.FirstOrDefault(c => c.Uuid == "6e400002-b5a3-f393-e0a9-e50e24dcca9e");
 
                     read.ValueUpdated += (o, args) =>
                     {
@@ -107,13 +109,13 @@ namespace LocationTest.Droid
                         if (read.StringValue.Contains("end"))
                         {
                             bluetoothBuffer.AddRange(bytes);
-                          
+
                             File.Delete(filePath + ".CSV");
                             File.WriteAllBytes(filePath + System.DateTime.Now.ToString("MM-dd-hh-mm-ss") + ".CSV", this.bluetoothBuffer.ToArray());
                             bluetoothBuffer.Clear();
                         }
                         this.bluetoothBuffer.AddRange(bytes);
-                        
+
                     };
 
                     await read.StartUpdatesAsync();
