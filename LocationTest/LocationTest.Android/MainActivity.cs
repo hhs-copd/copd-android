@@ -48,12 +48,10 @@ namespace LocationTest.Droid
             PermissionManager.RequestPermissions(this);
 
 
-            FileStream fileStream = null;
-
             IBluetoothLE bluetooth = CrossBluetoothLE.Current;
             BluetoothManager bluetoothManager = new BluetoothManager(bluetooth.Adapter);
             bluetooth.Adapter.ScanMode = ScanMode.Balanced;
-            bluetooth.Adapter.DeviceDiscovered += (sender, args) =>
+            bluetooth.Adapter.DeviceDiscovered += (_, args) =>
             {
                 string filePath = Path.Combine(StoragePath, "data.csv");
                 if (!File.Exists(filePath))
@@ -61,15 +59,15 @@ namespace LocationTest.Droid
                     File.Create(filePath).Dispose();
                 }
 
-                fileStream = new FileStream(filePath, FileMode.Append);
-
                 bluetoothManager.DeviceDiscovered(args, data =>
                 {
-                    fileStream.Write(data, 0, data.Length);
+                    using (FileStream stream = new FileStream(filePath, FileMode.Append))
+                    {
+                        stream.Write(data, 0, data.Length);
+                    }
                 });
             };
-            bluetooth.Adapter.DeviceDisconnected += (sender, args) => fileStream.Dispose();
-            bluetooth.StateChanged += (sender, args) =>
+            bluetooth.StateChanged += (_, args) =>
             {
                 Console.WriteLine($"The bluetooth state changed to {args.NewState}");
             };

@@ -11,7 +11,8 @@ namespace LocationTest
         private readonly Auth0Client _client = new Auth0Client(new Auth0ClientOptions
         {
             Domain = "copd.eu.auth0.com",
-            ClientId = "Q0vV85RwoMnKUzaLwGAB8RKoPPh85Oww"
+            ClientId = "Q0vV85RwoMnKUzaLwGAB8RKoPPh85Oww",
+            Scope = "openid profile"
         });
 
         public event PropertyChangedEventHandler PropertyChanged;
