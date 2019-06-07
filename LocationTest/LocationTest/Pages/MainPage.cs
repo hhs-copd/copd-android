@@ -40,8 +40,14 @@ namespace LocationTest.Pages
             DependencyService.Register<IBluetoothService>();
             DependencyService.Get<IBluetoothService>().ConnectAndWrite(new BluetoothHandler
             {
-                OnConnect = (name) => { this.ConnectedDevices.Add(name); this.UpdateDevices(); },
-                OnDisconnect = (name) => { this.ConnectedDevices.Remove(name); this.UpdateDevices(); }
+                OnConnect = (name) => {
+                    this.ConnectedDevices.Add(name);
+                    this.UpdateDevices();
+                },
+                OnDisconnect = (name) => {
+                    this.ConnectedDevices.Remove(name);
+                    this.UpdateDevices();
+                }
             });
         }
 
