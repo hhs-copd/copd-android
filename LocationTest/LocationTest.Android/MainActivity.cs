@@ -10,6 +10,7 @@ using Plugin.BLE.Abstractions.Contracts;
 using System;
 using System.IO;
 using System.Threading.Tasks;
+using Xamarin.Forms;
 using Xamarin.Forms.Platform.Android;
 
 namespace LocationTest.Droid
@@ -33,20 +34,19 @@ namespace LocationTest.Droid
     {
         private const string StoragePath = "/storage/emulated/0/android/data/com.copd.COPDMonitor.Android/files/";
 
-        protected override void OnCreate(Bundle savedInstanceState)
+        protected override void OnCreate(Bundle bundle)
         {
-            base.OnCreate(savedInstanceState);
-
-            this.IsGooglePlayServicesInstalled();
-
-            Xamarin.Forms.Forms.Init(this, savedInstanceState);
-            this.LoadApplication(new App(new SignInViewModel()));
-
             TabLayoutResource = Resource.Layout.Tabbar;
             ToolbarResource = Resource.Layout.Toolbar;
 
-            PermissionManager.RequestPermissions(this);
+            base.OnCreate(bundle);
 
+            Forms.Init(this, bundle);
+            this.LoadApplication(new App());
+
+            this.IsGooglePlayServicesInstalled();
+
+            PermissionManager.RequestPermissions(this);
 
             IBluetoothLE bluetooth = CrossBluetoothLE.Current;
             BluetoothManager bluetoothManager = new BluetoothManager(bluetooth.Adapter);
@@ -95,10 +95,7 @@ namespace LocationTest.Droid
             {
                 // Check if there is a way the user can resolve the issue
                 string errorString = GoogleApiAvailability.Instance.GetErrorString(queryResult);
-                Log.Error("MainActivity", "There is a problem with Google Play Services on this device: {0} - {1}",
-                          queryResult, errorString);
-
-                // Alternately, display the error to the user.
+                Log.Error("MainActivity", "There is a problem with Google Play Services on this device: {0} - {1}", queryResult, errorString);
             }
 
             return false;
