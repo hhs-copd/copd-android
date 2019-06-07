@@ -5,11 +5,7 @@ using Android.Gms.Common;
 using Android.OS;
 using Android.Util;
 using Auth0.OidcClient;
-using Plugin.BLE;
-using Plugin.BLE.Abstractions.Contracts;
-using System;
-using System.IO;
-using System.Threading.Tasks;
+using LocationTest.Droid.Services;
 using Xamarin.Forms;
 using Xamarin.Forms.Platform.Android;
 
@@ -30,10 +26,8 @@ namespace LocationTest.Droid
         DataHost = "copd.eu.auth0.com",
         DataPathPrefix = "/android/com.copd.copdmonitor.android/callback"
     )]
-    public class MainActivity : FormsAppCompatActivity
+    public class LoginActivity : FormsAppCompatActivity
     {
-        private const string StoragePath = "/storage/emulated/0/android/data/com.copd.COPDMonitor.Android/files/";
-
         protected override void OnCreate(Bundle bundle)
         {
             TabLayoutResource = Resource.Layout.Tabbar;
@@ -46,33 +40,7 @@ namespace LocationTest.Droid
 
             this.IsGooglePlayServicesInstalled();
 
-            PermissionManager.RequestPermissions(this);
-
-            IBluetoothLE bluetooth = CrossBluetoothLE.Current;
-            BluetoothManager bluetoothManager = new BluetoothManager(bluetooth.Adapter);
-            bluetooth.Adapter.ScanMode = ScanMode.Balanced;
-            bluetooth.Adapter.DeviceDiscovered += (_, args) =>
-            {
-                string filePath = Path.Combine(StoragePath, "data.csv");
-                if (!File.Exists(filePath))
-                {
-                    File.Create(filePath).Dispose();
-                }
-
-                bluetoothManager.DeviceDiscovered(args, data =>
-                {
-                    using (FileStream stream = new FileStream(filePath, FileMode.Append))
-                    {
-                        stream.Write(data, 0, data.Length);
-                    }
-                });
-            };
-            bluetooth.StateChanged += (_, args) =>
-            {
-                Console.WriteLine($"The bluetooth state changed to {args.NewState}");
-            };
-
-            Task scan = bluetooth.Adapter.StartScanningForDevicesAsync();
+            PermissionService.RequestPermissions(this);
         }
 
         protected override void OnNewIntent(Intent intent)

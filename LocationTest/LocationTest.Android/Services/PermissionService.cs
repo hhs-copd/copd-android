@@ -5,9 +5,9 @@ using Android.Support.V4.App;
 using Android.Support.V4.Content;
 using System.Linq;
 
-namespace LocationTest.Droid
+namespace LocationTest.Droid.Services
 {
-    internal static class PermissionManager
+    internal static class PermissionService
     {
         private static readonly string[] RequiredPermissions = new[]
         {

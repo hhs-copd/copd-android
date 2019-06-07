@@ -1,4 +1,5 @@
-﻿using Xamarin.Forms;
+﻿using LocationTest.Pages;
+using Xamarin.Forms;
 
 namespace LocationTest
 {

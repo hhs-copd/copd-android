@@ -1,11 +1,12 @@
 ﻿using Auth0.OidcClient;
 using LocationTest.Config;
+using LocationTest.Droid.Services;
 using LocationTest.Services;
 using System.Threading.Tasks;
 using Xamarin.Forms;
 
 [assembly: Dependency(typeof(AuthenticationService))]
-namespace LocationTest.Services
+namespace LocationTest.Droid.Services
 {
     public class AuthenticationService : IAuthenticationService
     {

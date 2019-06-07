@@ -2,11 +2,11 @@
 using System;
 using Xamarin.Forms;
 
-namespace LocationTest
+namespace LocationTest.Pages
 {
     public class LoginPage : ContentPage
     {
-        private readonly StackLayout Layout;
+        private readonly StackLayout PageLayout;
 
         public LoginPage()
         {
@@ -45,7 +45,7 @@ namespace LocationTest
                 Source = "https://i.imgur.com/gOF3CxE.jpg"
             };
 
-            this.Layout = new StackLayout
+            this.PageLayout = new StackLayout
             {
                 Children =
                 {
@@ -61,15 +61,15 @@ namespace LocationTest
 
             Grid grid = new Grid();
             grid.Children.Add(image);
-            grid.Children.Add(this.Layout);
+            grid.Children.Add(this.PageLayout);
 
             this.Content = grid;
         }
 
         private async void OnButtonClicked(object sender, EventArgs args)
         {
-            this.Layout.Children.Clear();
-            this.Layout.Children.Add(new ActivityIndicator
+            this.PageLayout.Children.Clear();
+            this.PageLayout.Children.Add(new ActivityIndicator
             {
                 IsEnabled = true,
                 IsRunning = true,
@@ -81,13 +81,13 @@ namespace LocationTest
             IAuthenticationService authenticationService = DependencyService.Get<IAuthenticationService>();
             LoginResult authenticationResult = await authenticationService.Authenticate();
 
-            if (!authenticationResult.Error)
+            if (authenticationResult.Error)
             {
-                Application.Current.MainPage = new MainPage();
+                Application.Current.MainPage = new LoginPage();
             }
             else
             {
-                Application.Current.MainPage = new LoginPage();
+                Application.Current.MainPage = new NavigationPage(new MainPage());
             }
         }
     }

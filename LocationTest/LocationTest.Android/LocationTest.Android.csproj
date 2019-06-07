@@ -69,10 +69,10 @@
     </PackageReference>
   </ItemGroup>
   <ItemGroup>
-    <Compile Include="AuthenticationService.cs" />
-    <Compile Include="BluetoothManager.cs" />
-    <Compile Include="MainActivity.cs" />
-    <Compile Include="PermissionManager.cs" />
+    <Compile Include="Services\AuthenticationService.cs" />
+    <Compile Include="Services\BluetoothService.cs" />
+    <Compile Include="LoginActivity.cs" />
+    <Compile Include="Services\PermissionService.cs" />
     <Compile Include="Resources\Resource.designer.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
   </ItemGroup>
