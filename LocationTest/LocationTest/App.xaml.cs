@@ -1,17 +1,26 @@
 ﻿using System;
 using Xamarin.Forms;
 using Xamarin.Forms.Xaml;
+using LocationTest.Views;
+using LocationTest.ViewModels.Base;
 
 [assembly: XamlCompilation(XamlCompilationOptions.Compile)]
 namespace LocationTest
 {
     public partial class App : Application
     {
+        private static ViewModelLocator _locator;
+
+        public static ViewModelLocator Locator
+        {
+            get { return _locator = _locator ?? new ViewModelLocator(); }
+        }
+
         public App()
         {
             InitializeComponent();
 
-            MainPage = new MainPage();
+            MainPage = new NavigationPage(new LinePlotView(null));
         }
 
         protected override void OnStart()

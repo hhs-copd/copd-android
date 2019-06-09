@@ -5,7 +5,7 @@ VisualStudioVersion = 15.0.28307.438
 MinimumVisualStudioVersion = 10.0.40219.1
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "LocationTest.Android", "LocationTest\LocationTest.Android\LocationTest.Android.csproj", "{82A92CF0-2F08-460A-94D0-416C4F0B020B}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "LocationTest", "LocationTest\LocationTest\LocationTest.csproj", "{F6699078-B9BF-4F71-A0A1-2A8A8E6FFE4D}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "LocationTest", "LocationTest\LocationTest\LocationTest.csproj", "{F6699078-B9BF-4F71-A0A1-2A8A8E6FFE4D}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution

@@ -59,6 +59,7 @@ namespace LocationTest.Droid
             this.IsGooglePlayServicesInstalled();
             this.RequestPermissions();
             Xamarin.Forms.Forms.Init(this, savedInstanceState);
+            OxyPlot.Xamarin.Forms.Platform.Android.PlotViewRenderer.Init();
             this.LoadApplication(new App());
             IBluetoothLE bluetooth = CrossBluetoothLE.Current;
             this._adapter = bluetooth.Adapter;
@@ -69,7 +70,6 @@ namespace LocationTest.Droid
 
             TabLayoutResource = Resource.Layout.Tabbar;
             ToolbarResource = Resource.Layout.Toolbar;
-
 
 
 
