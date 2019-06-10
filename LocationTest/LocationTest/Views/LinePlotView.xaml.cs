@@ -22,6 +22,12 @@ namespace LocationTest.Views
             Parameter = parameter;
 
             BindingContext = App.Locator.LineViewModel;
+          
+        }
+
+        private void BackButton_Clicked(object sender, EventArgs e)
+        {
+            throw new NotImplementedException();
         }
 
         protected override void OnAppearing()
