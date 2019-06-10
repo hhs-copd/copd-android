@@ -40,7 +40,21 @@ namespace LocationTest.ViewModels
             lineSerie.Points.Add(new DataPoint(30, 1));
             lineSerie.Points.Add(new DataPoint(40, 12));
 
+            lineSerie.Points.Add(new DataPoint(30, 27));
+            var lineSerie2 = new LineSeries
+            {
+                StrokeThickness = 2.0
+            };
+
+            lineSerie2.Points.Add(new DataPoint(0, 0));
+            lineSerie2.Points.Add(new DataPoint(10, 25));
+            lineSerie2.Points.Add(new DataPoint(30, 45));
+            lineSerie2.Points.Add(new DataPoint(40, 35));
+
+            lineSerie2.Points.Add(new DataPoint(30, 27));
+            lineSerie.Points.Sort((x,y) => x.X.CompareTo(y.X));
             PlotModel.Series.Add(lineSerie);
+            PlotModel.Series.Add(lineSerie2);
         }
     }
 }

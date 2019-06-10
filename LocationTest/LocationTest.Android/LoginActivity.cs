@@ -34,7 +34,7 @@ namespace LocationTest.Droid
             ToolbarResource = Resource.Layout.Toolbar;
 
             base.OnCreate(bundle);
-
+            OxyPlot.Xamarin.Forms.Platform.Android.PlotViewRenderer.Init();
             Forms.Init(this, bundle);
             this.LoadApplication(new App());
 

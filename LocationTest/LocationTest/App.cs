@@ -19,10 +19,9 @@ namespace LocationTest
 
         public App()
         {
-
             MainPage = new NavigationPage(new LoginPage());
         }
-
+        
         protected override void OnStart()
         {
             // Handle when your app starts
