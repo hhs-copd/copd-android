@@ -3,11 +3,14 @@ using LocationTest.Views;
 using System;
 using System.Collections.Generic;
 using Xamarin.Forms;
+using System.Net.Http;
+using System.Threading.Tasks;
 
 namespace LocationTest.Pages
 {
     public class MainPage : ContentPage
     {
+        private static readonly HttpClient client = new HttpClient();
         private List<string> ConnectedDevices { get; } = new List<string>();
 
         private readonly StackLayout devicesStackLayout;
@@ -22,6 +25,16 @@ namespace LocationTest.Pages
                 Margin = new Thickness(0, 30, 0, 5),
                 VerticalOptions = LayoutOptions.Center
             };
+            Button buttonSendData = new Button
+            {
+                Text = "Send Data",
+                HorizontalOptions = LayoutOptions.Center,
+                IsEnabled = true,
+                IsVisible = true,
+                Margin = new Thickness(0, 20, 0, 0),
+                Padding = new Thickness(20, 5)
+            };
+            //buttonSendData.Clicked += ButtonSendData_Clicked;
             Button buttonConnectBle = new Button
             {
                 Text = "Connect to device",
@@ -60,34 +73,53 @@ namespace LocationTest.Pages
                 }
             };
 
-            //DependencyService.Register<IBluetoothService>();
-            //DependencyService.Get<IBluetoothService>().ConnectAndWrite(new BluetoothHandler
-            //{
-            //    OnConnect = (name) => {
-            //        this.ConnectedDevices.Add(name);
-            //        this.UpdateDevices();
-            //    },
-            //    OnDisconnect = (name) => {
-            //        this.ConnectedDevices.Remove(name);
-            //        this.UpdateDevices();
-            //    }
-            //});
-        }
-
-        private void OnConnect(object sender, EventArgs e)
-        {
             DependencyService.Register<IBluetoothService>();
             DependencyService.Get<IBluetoothService>().ConnectAndWrite(new BluetoothHandler
             {
-                OnConnect = (name) => {
+                OnConnect = (name) =>
+                {
                     this.ConnectedDevices.Add(name);
                     this.UpdateDevices();
                 },
-                OnDisconnect = (name) => {
+                OnDisconnect = (name) =>
+                {
                     this.ConnectedDevices.Remove(name);
                     this.UpdateDevices();
                 }
             });
+        }
+
+        private async Task ButtonSendData_Clicked(object sender, EventArgs e)
+        {
+            var values = new Dictionary<string, string>
+{
+   { "thing1", "hello" },
+   { "thing2", "world" }
+};
+
+            var content = new FormUrlEncodedContent(values);
+
+            var response = await client.PostAsync("http://www.example.com/recepticle.aspx", content);
+
+            var responseString = await response.Content.ReadAsStringAsync();
+        }
+
+        private void OnConnect(object sender, EventArgs e)
+        {
+            //DependencyService.Register<IBluetoothService>();
+            //DependencyService.Get<IBluetoothService>().ConnectAndWrite(new BluetoothHandler
+            //{
+            //    OnConnect = (name) =>
+            //    {
+            //        this.ConnectedDevices.Add(name);
+            //        this.UpdateDevices();
+            //    },
+            //    OnDisconnect = (name) =>
+            //    {
+            //        this.ConnectedDevices.Remove(name);
+            //        this.UpdateDevices();
+            //    }
+            //});
         }
 
         private void OnButtonClicked(object sender, EventArgs e)
