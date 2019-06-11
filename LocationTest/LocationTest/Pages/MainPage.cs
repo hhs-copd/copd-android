@@ -8,81 +8,92 @@ namespace LocationTest.Pages
 {
     public class MainPage : ContentPage
     {
-        private List<string> ConnectedDevices { get; } = new List<string>();
+        private readonly StackLayout ConnectedDevicesLayout = new StackLayout();
 
-        private readonly StackLayout devicesStackLayout;
+        private readonly IBluetoothService BluetoothService;
 
         private readonly LoginResult LoginResult;
 
         public MainPage(LoginResult loginResult)
         {
+            this.Title = "Breeze Home";
+
             this.LoginResult = loginResult;
 
-            // Create the Button and attach Clicked handler.
-            Label label = new Label
+            DependencyService.Register<IBluetoothService>();
+            DependencyService.Register<ILambdaFunctionDataService>();
+
+            this.BluetoothService = DependencyService.Get<IBluetoothService>();
+
+            this.BluetoothService.Listen(new BluetoothHandler
             {
-                Text = "Connected devices:",
+                OnConnect = _ => this.UpdateDevices(),
+                OnDisconnect = _ => this.UpdateDevices()
+            });
+
+            this.UpdateDevices();
+            this.OnConnect(null, new EventArgs());
+
+            Label connectedDevicesLabel = new Label
+            {
+                Text = "Connected Devices",
                 FontSize = 14,
-                Margin = new Thickness(0, 30, 0, 5),
+                Margin = new Thickness(10, 30, 0, 5),
                 VerticalOptions = LayoutOptions.Center
             };
 
+
             Button buttonConnectBle = new Button
             {
-                Text = "Connect to device",
+                Text = "Connect to wearable",
                 HorizontalOptions = LayoutOptions.Center,
                 IsEnabled = true,
                 IsVisible = true,
-                Margin = new Thickness(0, 20, 0, 0),
+                Margin = new Thickness(0, 10, 0, 0),
                 Padding = new Thickness(20, 5)
             };
             buttonConnectBle.Clicked += this.OnConnect;
 
             Button buttonPlot = new Button
             {
-                Text = "Generate Plot",
+                Text = "Show data graphs",
                 HorizontalOptions = LayoutOptions.Center,
                 IsEnabled = true,
                 IsVisible = true,
-                Margin = new Thickness(0, 20,0, 0),
-                Padding = new Thickness(20, 5)
+                Margin = new Thickness(00, 10, 0, 0),
+                Padding = new Thickness(32, 5)
             };
             buttonPlot.Clicked += this.OnButtonClicked;
 
-            this.devicesStackLayout = new StackLayout();
+            var buttonGrid = new Grid
+            {
+                ColumnDefinitions = new ColumnDefinitionCollection
+                {
+                    new ColumnDefinition { Width = GridLength.Star },
+                    new ColumnDefinition { Width = GridLength.Star }
+                }
+            };
+            buttonGrid.Children.Add(buttonConnectBle);
+            buttonGrid.Children.Add(buttonPlot);
+            Grid.SetColumn(buttonPlot, 1);
 
             this.Padding = new Thickness(5, Device.RuntimePlatform == Device.iOS ? 20 : 0, 5, 0);
-
             this.Content = new ScrollView
             {
                 Content = new StackLayout()
                 {
                     Children = {
-                        label,
-                        buttonConnectBle,
-                        buttonPlot,
-                        this.devicesStackLayout
+                        buttonGrid,
+                        connectedDevicesLabel,
+                        this.ConnectedDevicesLayout
                     }
                 }
             };
-
-            DependencyService.Register<IBluetoothService>();
-            DependencyService.Register<ILambdaFunctionDataService>();
         }
 
-        private void OnConnect(object sender, EventArgs e)
+        private async void OnConnect(object sender, EventArgs e)
         {
-            DependencyService.Get<IBluetoothService>().ConnectAndWrite(new BluetoothHandler
-            {
-                OnConnect = (name) => {
-                    this.ConnectedDevices.Add(name);
-                    this.UpdateDevices();
-                },
-                OnDisconnect = (name) => {
-                    this.ConnectedDevices.Remove(name);
-                    this.UpdateDevices();
-                }
-            });
+            await this.BluetoothService.Scan();
         }
 
         private void OnButtonClicked(object sender, EventArgs e)
@@ -92,15 +103,29 @@ namespace LocationTest.Pages
 
         private void UpdateDevices()
         {
-            this.devicesStackLayout.Children.Clear();
+            this.ConnectedDevicesLayout.Children.Clear();
 
-            foreach (var device in this.ConnectedDevices)
+            List<string> devices = this.BluetoothService.GetConnectedDevices();
+
+            if (devices.Count == 0)
             {
-                this.devicesStackLayout.Children.Add(new Label
+                this.ConnectedDevicesLayout.Children.Add(new Label
+                {
+                    Text = "No devices found...",
+                    FontSize = 18,
+                    Margin = new Thickness(20, 0, 0, 10),
+                    FontAttributes = FontAttributes.Bold,
+                    TextColor = Color.Gray
+                });
+            }
+
+            foreach (string device in devices)
+            {
+                this.ConnectedDevicesLayout.Children.Add(new Label
                 {
                     Text = device,
                     FontSize = 18,
-                    Margin = new Thickness(5, 10),
+                    Margin = new Thickness(20, 0, 0, 10),
                     FontAttributes = FontAttributes.Bold
                 });
             }

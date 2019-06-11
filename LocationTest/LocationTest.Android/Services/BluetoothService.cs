@@ -21,7 +21,28 @@ namespace LocationTest.Droid.Services
 
         private static readonly string[] AllowedDevices = { "CA:81:BA:4B:DC:02", "E2:4D:DB:60:C0:6B" };
 
-        public async Task ConnectAndWrite(BluetoothHandler handler = null)
+        public async Task Scan()
+        {
+            if (!CrossBluetoothLE.Current.IsOn)
+            {
+                Android.Widget.Toast.MakeText(Android.App.Application.Context, "Please enable Bluetooth.", Android.Widget.ToastLength.Short).Show();
+                return;
+            }
+
+            if (CrossBluetoothLE.Current.Adapter.IsScanning)
+            {
+                await CrossBluetoothLE.Current.Adapter.StopScanningForDevicesAsync();
+            }
+
+            await CrossBluetoothLE.Current.Adapter.StartScanningForDevicesAsync();
+        }
+
+        public List<string> GetConnectedDevices()
+        {
+            return CrossBluetoothLE.Current.Adapter.ConnectedDevices.Select(device => device.Name).ToList();
+        }
+
+        public void Listen(BluetoothHandler handler = null)
         {
             string filePath = Path.Combine("storage", "emulated", "0", "Android", "data", "com.copd.COPDMonitor.Android", "files", "data.csv");
 
@@ -41,8 +62,6 @@ namespace LocationTest.Droid.Services
             {
                 Console.WriteLine($"The bluetooth state changed to {args.NewState}");
             };
-
-            await bluetooth.Adapter.StartScanningForDevicesAsync();
         }
 
         private static async void ReadData(IAdapter adapter, DeviceEventArgs args, string filePath, Action<string> onConnect = null)
@@ -75,7 +94,7 @@ namespace LocationTest.Droid.Services
 
                     read.ValueUpdated += (o, _) =>
                     {
-                        var data = read.Value;
+                        byte[] data = read.Value;
                         using (FileStream stream = new FileStream(filePath, FileMode.Append))
                         {
                             stream.Write(data, 0, data.Length);
