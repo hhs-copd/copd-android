@@ -12,10 +12,11 @@ using Xamarin.Forms.Platform.Android;
 namespace LocationTest.Droid
 {
     [Activity(
-        Label = "COPD Monitor",
-        Icon = "@mipmap/icon",
+        Label = "Breeze",
         Theme = "@style/MainTheme",
         MainLauncher = true,
+        RoundIcon = "@mipmap/icon",
+        Icon = "@mipmap/icon",
         LaunchMode = LaunchMode.SingleTask,
         ConfigurationChanges = ConfigChanges.ScreenSize | ConfigChanges.Orientation
     )]
