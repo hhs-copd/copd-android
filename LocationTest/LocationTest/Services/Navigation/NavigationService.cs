@@ -1,34 +1,36 @@
-﻿using System;
+﻿using LocationTest.ViewModels;
+using LocationTest.Views;
+using System;
 using System.Collections.Generic;
 using Xamarin.Forms;
-using LocationTest.ViewModels;
-using LocationTest.Views;
 
 namespace LocationTest.Services.Navigation
 {
     public class NavigationService : INavigationService
     {
-        private IDictionary<Type, Type> viewModelRouting = new Dictionary<Type, Type>()
+        private readonly IDictionary<Type, Type> viewModelRouting = new Dictionary<Type, Type>()
         {
             { typeof(LinePlotViewModel), typeof(LinePlotView) },
         };
 
         public void NavigateTo<TDestinationViewModel>(object navigationContext = null)
         {
-            Type pageType = viewModelRouting[typeof(TDestinationViewModel)];
-            var page = Activator.CreateInstance(pageType, navigationContext) as Page;
+            Type pageType = this.viewModelRouting[typeof(TDestinationViewModel)];
 
-            if (page != null)
+            if (Activator.CreateInstance(pageType, navigationContext) is Page page)
+            {
                 Application.Current.MainPage.Navigation.PushAsync(page);
+            }
         }
 
         public void NavigateTo(Type destinationType, object navigationContext = null)
         {
-            Type pageType = viewModelRouting[destinationType];
-            var page = Activator.CreateInstance(pageType, navigationContext) as Page;
+            Type pageType = this.viewModelRouting[destinationType];
 
-            if (page != null)
+            if (Activator.CreateInstance(pageType, navigationContext) is Page page)
+            {
                 Application.Current.MainPage.Navigation.PushAsync(page);
+            }
         }
 
         public void NavigateBack()
