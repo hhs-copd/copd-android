@@ -109,23 +109,7 @@ namespace LocationTest.Pages
             var responseString = await response.Content.ReadAsStringAsync();
         }
 
-        private void OnConnect(object sender, EventArgs e)
-        {
-            //DependencyService.Register<IBluetoothService>();
-            //DependencyService.Get<IBluetoothService>().ConnectAndWrite(new BluetoothHandler
-            //{
-            //    OnConnect = (name) =>
-            //    {
-            //        this.ConnectedDevices.Add(name);
-            //        this.UpdateDevices();
-            //    },
-            //    OnDisconnect = (name) =>
-            //    {
-            //        this.ConnectedDevices.Remove(name);
-            //        this.UpdateDevices();
-            //    }
-            //});
-        }
+  
 
         private void OnConnect(object sender, EventArgs e)
         {
