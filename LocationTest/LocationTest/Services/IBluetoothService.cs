@@ -1,9 +1,14 @@
-﻿using System.Threading.Tasks;
+﻿using System.Collections.Generic;
+using System.Threading.Tasks;
 
 namespace LocationTest.Services
 {
     public interface IBluetoothService
     {
-        Task ConnectAndWrite(BluetoothHandler handler = null);
+        Task Scan();
+
+        List<string> GetConnectedDevices();
+
+        void Listen(BluetoothHandler handler = null);
     }
 }
