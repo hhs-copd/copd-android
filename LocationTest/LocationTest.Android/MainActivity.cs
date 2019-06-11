@@ -19,8 +19,7 @@ using System.Threading.Tasks;
 namespace LocationTest.Droid
 {
     [Activity(
-        Label = "COPD Monitor",
-        Icon = "@mipmap/icon",
+        Label = "Breeze",
         Theme = "@style/MainTheme",
         MainLauncher = true,
         ConfigurationChanges = ConfigChanges.ScreenSize | ConfigChanges.Orientation

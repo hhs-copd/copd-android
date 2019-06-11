@@ -11,9 +11,18 @@ namespace LocationTest.Pages
         public LoginPage()
         {
             // Create the Button and attach Clicked handler.
+            Image logo = new Image
+            {
+                Source = "logo_clear.png",
+                HorizontalOptions = LayoutOptions.Start,
+                VerticalOptions = LayoutOptions.Start,
+                Margin = new Thickness(20),
+                Scale = 0.2
+            };
+
             Label title = new Label
             {
-                Text = "Welcome!",
+                Text = "Welcome to Breeze!",
                 HorizontalOptions = LayoutOptions.Center,
                 VerticalOptions = LayoutOptions.Center,
                 FontSize = 22,
@@ -25,6 +34,7 @@ namespace LocationTest.Pages
             {
                 Text = "Please sign in to be able to use this application.",
                 HorizontalOptions = LayoutOptions.Center,
+                HorizontalTextAlignment = TextAlignment.Center,
                 VerticalOptions = LayoutOptions.Center,
                 FontSize = 18,
                 Margin = new Thickness(0, 5, 0, 0)
@@ -39,10 +49,10 @@ namespace LocationTest.Pages
             };
             button.Clicked += this.OnButtonClicked;
 
-            Image image = new Image
+            Image background = new Image
             {
                 Aspect = Aspect.AspectFill,
-                Source = "https://i.imgur.com/gOF3CxE.jpg"
+                Source = "background.jpg"
             };
 
             this.PageLayout = new StackLayout
@@ -60,7 +70,8 @@ namespace LocationTest.Pages
             };
 
             Grid grid = new Grid();
-            grid.Children.Add(image);
+            grid.Children.Add(background);
+            grid.Children.Add(logo);
             grid.Children.Add(this.PageLayout);
 
             this.Content = grid;

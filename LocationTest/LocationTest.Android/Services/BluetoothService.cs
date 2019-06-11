@@ -34,15 +34,7 @@ namespace LocationTest.Droid.Services
                     File.Create(filePath).Dispose();
                 }
 
-                ReadData(bluetooth.Adapter, args, data =>
-                {
-                    handler?.OnWrite?.Invoke();
-
-                    using (FileStream stream = new FileStream(filePath, FileMode.Append))
-                    {
-                        stream.Write(data, 0, data.Length);
-                    }
-                }, handler?.OnConnect);
+                ReadData(bluetooth.Adapter, args, filePath, handler?.OnConnect);
             };
             bluetooth.Adapter.DeviceDisconnected += (_, args) => handler?.OnDisconnect?.Invoke(args.Device.Name);
             bluetooth.StateChanged += (_, args) =>
@@ -53,7 +45,7 @@ namespace LocationTest.Droid.Services
             await bluetooth.Adapter.StartScanningForDevicesAsync();
         }
 
-        private static async void ReadData(IAdapter adapter, DeviceEventArgs args, Action<byte[]> onReceiveData, Action<string> onConnect = null)
+        private static async void ReadData(IAdapter adapter, DeviceEventArgs args, string filePath, Action<string> onConnect = null)
         {
             try
             {
@@ -81,7 +73,14 @@ namespace LocationTest.Droid.Services
                         continue;
                     }
 
-                    read.ValueUpdated += (o, _) => onReceiveData(read.Value);
+                    read.ValueUpdated += (o, _) =>
+                    {
+                        var data = read.Value;
+                        using (FileStream stream = new FileStream(filePath, FileMode.Append))
+                        {
+                            stream.Write(data, 0, data.Length);
+                        }
+                    };
 
                     await read.StartUpdatesAsync();
                 }
