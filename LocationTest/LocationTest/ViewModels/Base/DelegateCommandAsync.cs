@@ -28,8 +28,8 @@ namespace LocationTest.ViewModels.Base
         /// <param name="canExecute"></param>
         public DelegateCommandAsync(Func<Task> execute, Func<Task<bool>> canExecute)
         {
-            _execute = execute;
-            _canExecute = canExecute;
+            this._execute = execute;
+            this._canExecute = canExecute;
         }
 
         /// <summary>
@@ -39,8 +39,10 @@ namespace LocationTest.ViewModels.Base
         /// <returns></returns>
         public bool CanExecute(object parameter)
         {
-            if (_canExecute != null)
-                return _canExecute().Result;
+            if (this._canExecute != null)
+            {
+                return this._canExecute().Result;
+            }
 
             return true;
         }
@@ -51,7 +53,7 @@ namespace LocationTest.ViewModels.Base
         /// <param name="parameter"></param>
         public void Execute(object parameter)
         {
-            _execute();
+            this._execute();
         }
 
         /// <summary>
@@ -64,9 +66,7 @@ namespace LocationTest.ViewModels.Base
         /// </summary>
         public void RaiseCanExecuteChanged()
         {
-            EventHandler tmpHandle = CanExecuteChanged;
-            if (tmpHandle != null)
-                tmpHandle(this, new EventArgs());
+            CanExecuteChanged?.Invoke(this, new EventArgs());
         }
     }
 
@@ -93,8 +93,8 @@ namespace LocationTest.ViewModels.Base
         /// <param name="canExecute"></param>
         public DelegateCommandAsync(Func<T, Task> execute, Func<T, Task<bool>> canExecute)
         {
-            _execute = execute;
-            _canExecute = canExecute;
+            this._execute = execute;
+            this._canExecute = canExecute;
         }
 
         /// <summary>
@@ -104,8 +104,10 @@ namespace LocationTest.ViewModels.Base
         /// <returns></returns>
         public bool CanExecute(object parameter)
         {
-            if (_canExecute != null)
-                return _canExecute((T)parameter).Result;
+            if (this._canExecute != null)
+            {
+                return this._canExecute((T)parameter).Result;
+            }
 
             return true;
         }
@@ -116,7 +118,7 @@ namespace LocationTest.ViewModels.Base
         /// <param name="parameter"></param>
         public void Execute(object parameter)
         {
-            _execute((T)parameter);
+            this._execute((T)parameter);
         }
 
         /// <summary>
@@ -129,9 +131,7 @@ namespace LocationTest.ViewModels.Base
         /// </summary>
         public void RaiseCanExecuteChanged()
         {
-            EventHandler tmpHandle = CanExecuteChanged;
-            if (tmpHandle != null)
-                tmpHandle(this, new EventArgs());
+            CanExecuteChanged?.Invoke(this, new EventArgs());
         }
     }
 }

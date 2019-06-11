@@ -1,72 +1,92 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Text;
-using OxyPlot;
-using OxyPlot.Series;
+﻿using LocationTest.Services;
 using LocationTest.ViewModels.Base;
 using Newtonsoft.Json;
+using OxyPlot;
+using OxyPlot.Axes;
+using OxyPlot.Series;
+using System;
+using System.Collections.Generic;
+using System.Linq;
+using Xamarin.Forms;
 
 namespace LocationTest.ViewModels
 {
     public class LinePlotViewModel : ViewModelBase
     {
+        public string Token { get; set; }
+
+        private int MarkerType = 1;
+
         private PlotModel _plotModel;
-        private int markerType = 1;
-        private readonly string JSONSTUFF = "[{x:494,y:293},{x:493,y:298.7},{x:497,y:299.4},{x:492,y:299.6}]";
-
-        private readonly string JSONSTUFF2 = "[{x:494.5,y:293},{x:491,y:298.7},{x:499,y:299.4},{x:492,y:299.6}]";
-
-        private readonly string JSONSTUFF3 = "[{x:494.9,y:293},{x:493,y:298.7},{x:497,y:299.4},{x:492,y:299.6}]";
         public PlotModel PlotModel
         {
-            get { return _plotModel; }
+            get => this._plotModel;
             set
             {
-                _plotModel = value;
-                RaisePropertyChanged();
+                this._plotModel = value;
+                this.RaisePropertyChanged();
             }
         }
 
-        public LineSeries GenerateLineSeries(string JSON){
-            List<DataPoint> json = JsonConvert.DeserializeObject<List<DataPoint>>(JSON);
+        public LineSeries GenerateLineSeries(string name, GraphResponse graph)
+        {
+            IEnumerable<DataPoint> dataPoints = JsonConvert
+                .DeserializeObject<List<Coordinate>>(graph.Body)
+                .Select(item => new DataPoint(DateTimeAxis.ToDouble(DateTimeOffset.FromUnixTimeMilliseconds(long.Parse(item.X)).Date), double.Parse(item.Y)))
+                .OrderBy(a => a.X);
+
             LineSeries series = new LineSeries
             {
                 RenderInLegend = true,
-                Title ="SOMESENSOR",
-            Tag = "sensor",
-            MarkerType = (MarkerType)markerType,
-            LineStyle = LineStyle.Automatic,
+                Title = name,
+                Tag = name,
+                MarkerFill = OxyColor.FromRgb(50, 60, 255),
+                MarkerSize = 4,
+                MarkerType = OxyPlot.MarkerType.Circle,
+                LineStyle = LineStyle.Automatic,
+                MarkerStroke = OxyColor.FromRgb(20, 30, 255),
                 StrokeThickness = 2.0,
             };
-            if (markerType==4)
-                markerType = 1;
-            else
-                markerType++;
 
-            json.ForEach(x => series.Points.Add(x));
-
-            series.Points.Sort((x, y) => x.X.CompareTo(y.X));
-            return series;
+            this.MarkerType++;
+            if (this.MarkerType == 5)
+            {
+                this.MarkerType = 1;
             }
-        public override void OnAppearing(object navigationContext)
+
+            dataPoints.ToList().ForEach(series.Points.Add);
+
+            return series;
+        }
+
+        public override async void OnAppearing(object navigationContext)
         {
             base.OnAppearing(navigationContext);
 
-            PlotModel = new PlotModel
+            this.PlotModel = new PlotModel
             {
-                Title = "Data"
+                Title = "Data",
             };
 
-            var lineserie1 = GenerateLineSeries(JSONSTUFF);
-            var lineserie2 = GenerateLineSeries(JSONSTUFF2);
-            var lineserie3 =GenerateLineSeries(JSONSTUFF3);
-            
+            var startDate = DateTime.Now.AddDays(-10);
+            var endDate = DateTime.Now;
 
-            PlotModel.Series.Add(lineserie1);
+            var minValue = DateTimeAxis.ToDouble(startDate);
+            var maxValue = DateTimeAxis.ToDouble(endDate);
 
-            PlotModel.Series.Add(lineserie2);
+            this.PlotModel.Axes.Add(new LinearAxis() { Position = AxisPosition.Left });
+            this.PlotModel.Axes.Add(new DateTimeAxis() { Minimum = minValue, Maximum = maxValue, Position = AxisPosition.Bottom });
 
-            PlotModel.Series.Add(lineserie3);
+            ILambdaFunctionDataService dataService = DependencyService.Get<ILambdaFunctionDataService>();
+
+            foreach (var sensor in new string[] { "Temperature", "Humidity" })
+            {
+                var graph = await dataService.GetGraph(this.Token, sensor);
+                var series = this.GenerateLineSeries(sensor, graph);
+                this.PlotModel.Series.Add(series);
+            }
+
+            this.RaisePropertyChanged();
         }
     }
 }

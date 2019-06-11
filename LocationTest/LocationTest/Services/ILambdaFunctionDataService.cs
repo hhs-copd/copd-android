@@ -1,6 +1,11 @@
-﻿namespace LocationTest.Services
+﻿using System.Threading.Tasks;
+
+namespace LocationTest.Services
 {
-    internal interface ILambdaFunctionDataService
+    public interface ILambdaFunctionDataService
     {
+        Task<GraphResponse> GetGraph(string accessToken, string type);
+
+        Task PostData(string accessToken, string fileLocation);
     }
 }

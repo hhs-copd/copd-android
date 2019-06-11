@@ -87,7 +87,7 @@ namespace LocationTest.Pages
             }
             else
             {
-                Application.Current.MainPage = new NavigationPage(new MainPage());
+                Application.Current.MainPage = new NavigationPage(new MainPage(authenticationResult));
             }
         }
     }

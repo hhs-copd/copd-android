@@ -12,8 +12,12 @@ namespace LocationTest.Pages
 
         private readonly StackLayout devicesStackLayout;
 
-        public MainPage()
+        private readonly LoginResult LoginResult;
+
+        public MainPage(LoginResult loginResult)
         {
+            this.LoginResult = loginResult;
+
             // Create the Button and attach Clicked handler.
             Label label = new Label
             {
@@ -22,6 +26,7 @@ namespace LocationTest.Pages
                 Margin = new Thickness(0, 30, 0, 5),
                 VerticalOptions = LayoutOptions.Center
             };
+
             Button buttonConnectBle = new Button
             {
                 Text = "Connect to device",
@@ -32,6 +37,7 @@ namespace LocationTest.Pages
                 Padding = new Thickness(20, 5)
             };
             buttonConnectBle.Clicked += this.OnConnect;
+
             Button buttonPlot = new Button
             {
                 Text = "Generate Plot",
@@ -60,23 +66,12 @@ namespace LocationTest.Pages
                 }
             };
 
-            //DependencyService.Register<IBluetoothService>();
-            //DependencyService.Get<IBluetoothService>().ConnectAndWrite(new BluetoothHandler
-            //{
-            //    OnConnect = (name) => {
-            //        this.ConnectedDevices.Add(name);
-            //        this.UpdateDevices();
-            //    },
-            //    OnDisconnect = (name) => {
-            //        this.ConnectedDevices.Remove(name);
-            //        this.UpdateDevices();
-            //    }
-            //});
+            DependencyService.Register<IBluetoothService>();
+            DependencyService.Register<ILambdaFunctionDataService>();
         }
 
         private void OnConnect(object sender, EventArgs e)
         {
-            DependencyService.Register<IBluetoothService>();
             DependencyService.Get<IBluetoothService>().ConnectAndWrite(new BluetoothHandler
             {
                 OnConnect = (name) => {
@@ -92,14 +87,14 @@ namespace LocationTest.Pages
 
         private void OnButtonClicked(object sender, EventArgs e)
         {
-
-            Application.Current.MainPage = new NavigationPage(new LinePlotView(null));
+            this.Navigation.PushAsync(new LinePlotView(this.LoginResult));
         }
 
         private void UpdateDevices()
         {
             this.devicesStackLayout.Children.Clear();
-            foreach (string device in this.ConnectedDevices)
+
+            foreach (var device in this.ConnectedDevices)
             {
                 this.devicesStackLayout.Children.Add(new Label
                 {

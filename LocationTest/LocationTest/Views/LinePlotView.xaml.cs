@@ -1,41 +1,32 @@
-﻿using LocationTest.ViewModels;
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
+﻿using LocationTest.Services;
+using LocationTest.ViewModels;
 
 using Xamarin.Forms;
 using Xamarin.Forms.Xaml;
 
 namespace LocationTest.Views
 {
-	[XamlCompilation(XamlCompilationOptions.Compile)]
-	public partial class LinePlotView : ContentPage
-	{
-        public object Parameter { get; set; }
-
-        public LinePlotView(object parameter)
+    [XamlCompilation(XamlCompilationOptions.Compile)]
+    public partial class LinePlotView : ContentPage
+    {
+        public LinePlotView(LoginResult loginResult)
         {
-            InitializeComponent();
+            this.InitializeComponent();
 
-            Parameter = parameter;
+            var model = App.Locator.LineViewModel;
+            model.Token = loginResult.AccessToken;
 
-            BindingContext = App.Locator.LineViewModel;
-          
-        }
-
-        private void BackButton_Clicked(object sender, EventArgs e)
-        {
-            throw new NotImplementedException();
+            this.BindingContext = model;
         }
 
         protected override void OnAppearing()
         {
             base.OnAppearing();
 
-            var linePlotViewModel = BindingContext as LinePlotViewModel;
-            if (linePlotViewModel != null) linePlotViewModel.OnAppearing(Parameter);
+            if (this.BindingContext is LinePlotViewModel linePlotViewModel)
+            {
+                linePlotViewModel.OnAppearing(null);
+            }
         }
     }
 }

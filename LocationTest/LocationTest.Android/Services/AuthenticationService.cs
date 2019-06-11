@@ -25,7 +25,7 @@ namespace LocationTest.Droid.Services
 
         public async Task<LoginResult> Authenticate()
         {
-            IdentityModel.OidcClient.LoginResult response = await this._auth0Client.LoginAsync();
+            IdentityModel.OidcClient.LoginResult response = await this._auth0Client.LoginAsync(new { audience = "https://copd" });
 
             LoginResult result = new LoginResult
             {
