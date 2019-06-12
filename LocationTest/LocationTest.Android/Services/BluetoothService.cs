@@ -44,18 +44,15 @@ namespace LocationTest.Droid.Services
 
         public void Listen(BluetoothHandler handler = null)
         {
-            string filePath = Path.Combine("storage", "emulated", "0", "Android", "data", "com.copd.COPDMonitor.Android", "files", "data.csv");
-
-            IBluetoothLE bluetooth = CrossBluetoothLE.Current;
+           
+                               IBluetoothLE bluetooth = CrossBluetoothLE.Current;
             bluetooth.Adapter.ScanMode = ScanMode.Balanced;
-            bluetooth.Adapter.DeviceDiscovered += (_, args) =>
-            {
-                if (!File.Exists(filePath))
-                {
-                    File.Create(filePath).Dispose();
-                }
-
-                ReadData(bluetooth.Adapter, args, filePath, handler?.OnConnect);
+            bluetooth.Adapter.DeviceDiscovered += (device, args) =>
+            {             
+                   
+                
+               
+                ReadData(bluetooth.Adapter, args, handler?.OnConnect);
             };
             bluetooth.Adapter.DeviceDisconnected += (_, args) => handler?.OnDisconnect?.Invoke(args.Device.Name);
             bluetooth.StateChanged += (_, args) =>
@@ -64,8 +61,9 @@ namespace LocationTest.Droid.Services
             };
         }
 
-        private static async void ReadData(IAdapter adapter, DeviceEventArgs args, string filePath, Action<string> onConnect = null)
+        private static async void ReadData(IAdapter adapter, DeviceEventArgs args, Action<string> onConnect = null)
         {
+          
             try
             {
                 if (!AllowedDevices.Any(device => args.Device.NativeDevice.ToString().StartsWith(device)))
@@ -78,8 +76,11 @@ namespace LocationTest.Droid.Services
 
                 onConnect(args.Device.Name);
 
+               
+
                 foreach (IDevice dev in adapter.ConnectedDevices)
                 {
+                  
                     IList<IService> services = await dev.GetServicesAsync();
                     IService relevantService = services.FirstOrDefault(x => x.Id.Equals(Guid.Parse(ServiceGuid)));
                     IList<ICharacteristic> characteristics = await relevantService.GetCharacteristicsAsync();
@@ -91,9 +92,15 @@ namespace LocationTest.Droid.Services
                     {
                         continue;
                     }
+                    string filePath = Path.Combine("storage", "emulated", "0", "Android", "data", "com.copd.COPDMonitor.Android", "files", "data" + dev.NativeDevice.ToString().Replace(":", "") + ".csv");
 
+                    if (!File.Exists(filePath))
+                    {
+                        File.Create(filePath).Dispose();
+                    }
                     read.ValueUpdated += (o, _) =>
                     {
+                        
                         byte[] data = read.Value;
                         using (FileStream stream = new FileStream(filePath, FileMode.Append))
                         {

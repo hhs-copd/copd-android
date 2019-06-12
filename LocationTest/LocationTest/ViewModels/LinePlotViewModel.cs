@@ -32,7 +32,7 @@ namespace LocationTest.ViewModels
         {
             IEnumerable<DataPoint> dataPoints = JsonConvert
                 .DeserializeObject<List<Coordinate>>(graph.Body)
-                .Select(item => new DataPoint(DateTimeAxis.ToDouble(DateTimeOffset.FromUnixTimeMilliseconds(long.Parse(item.X)).Date), double.Parse(item.Y)))
+                .Select(item => DateTimeAxis.CreateDataPoint((DateTimeOffset.FromUnixTimeMilliseconds(long.Parse(item.X)).DateTime), double.Parse(item.Y)))
                 .OrderBy(a => a.X);
 
             LineSeries series = new LineSeries
@@ -70,21 +70,21 @@ namespace LocationTest.ViewModels
                     Title = "Data"
                 };
 
-                DateTime startDate = DateTime.Now.AddDays(-10);
-                DateTime endDate = DateTime.Now;
+                DateTime startDate = DateTime.Now.AddMinutes(-30);
+                DateTime endDate = DateTime.Now.AddMinutes(0);
 
                 double minValue = DateTimeAxis.ToDouble(startDate);
                 double maxValue = DateTimeAxis.ToDouble(endDate);
 
                 if (this.PlotModel.Axes.Count == 0)
                 {
-                    this.PlotModel.Axes.Add(new LinearAxis() { Position = AxisPosition.Left });
+                    this.PlotModel.Axes.Add(new LinearAxis() { Position = AxisPosition.Left, Minimum = 0, Maximum = 1050, });
                     this.PlotModel.Axes.Add(new DateTimeAxis() { Minimum = minValue, Maximum = maxValue, Position = AxisPosition.Bottom, IntervalType = DateTimeIntervalType.Seconds, StringFormat = "hh:mm:ss" });
                 }
 
                 ILambdaFunctionDataService dataService = DependencyService.Get<ILambdaFunctionDataService>();
 
-                foreach (string sensor in new string[] { "Temperature", "Humidity" })
+                foreach (string sensor in new string[] { "ThoraxCircumference","Temperature","Humidity","UVA","UVB","UVIndex", "PM10p0", "PM4p0", "PM2p5", "PM1p0", "Accelerometer-X", "Accelerometer-Y", "Accelerometer-Z", "Gyro-X", "Gyro-Y", "Gyro-Z"})
                 {
                     GraphResponse graph = await dataService.GetGraph(this.Token, sensor);
                     LineSeries series = this.GenerateLineSeries(sensor, graph);

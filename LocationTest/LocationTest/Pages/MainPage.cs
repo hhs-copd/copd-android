@@ -46,6 +46,7 @@ namespace LocationTest.Pages
                 VerticalOptions = LayoutOptions.Center
             };
 
+
             Button buttonConnectBle = new Button
             {
                 Text = "Connect to wearable",
@@ -66,9 +67,9 @@ namespace LocationTest.Pages
                 Margin = new Thickness(00, 10, 0, 0),
                 Padding = new Thickness(32, 5)
             };
-            buttonPlot.Clicked += this.OnPlotButtonClick;
+            buttonPlot.Clicked += this.OnButtonClicked;
 
-            Grid buttonGrid = new Grid
+            var buttonGrid = new Grid
             {
                 ColumnDefinitions = new ColumnDefinitionCollection
                 {
@@ -89,7 +90,7 @@ namespace LocationTest.Pages
                 Margin = new Thickness(00, 10, 0, 0),
                 Padding = new Thickness(32, 5)
             };
-            buttonUpload.Clicked += this.ButtonUpload_Clicked;
+            buttonUpload.Clicked += ButtonUpload_Clicked;
             this.Padding = new Thickness(5, Device.RuntimePlatform == Device.iOS ? 20 : 0, 5, 0);
             this.Content = new ScrollView
             {
@@ -107,20 +108,39 @@ namespace LocationTest.Pages
 
         private async void ButtonUpload_Clicked(object sender, EventArgs e)
         {
-            string from = Path.Combine("storage", "emulated", "0", "Android", "data", "com.copd.COPDMonitor.Android", "files", "data.csv");
-            string to = Path.Combine("storage", "emulated", "0", "Android", "data", "com.copd.COPDMonitor.Android", "files", "upload.csv");
-            File.Copy(from, to);
-            File.Delete(from);
-
+            
             try
             {
+                string from = Path.Combine("storage", "emulated", "0", "Android", "data", "com.copd.COPDMonitor.Android", "files", "dataE24DDB60C06B.csv");
+                string to = Path.Combine("storage", "emulated", "0", "Android", "data", "com.copd.COPDMonitor.Android", "files", "uploadE24DDB60C06B.csv");
+                File.Copy(from, to);
+            File.Delete(from);
+           
                 await this.LambdaFunctionDataService.PostData(this.LoginResult.AccessToken, to);
-                File.Delete(to);
+
+                System.IO.File.Delete(to);
             }
             catch (Exception exept)
             {
+                //De button is nu helemaal waardeloos, ik kijk er later na
                 Console.WriteLine(exept);
-                File.Move(to, from);
+            }
+
+            try
+            {
+                string from = Path.Combine("storage", "emulated", "0", "Android", "data", "com.copd.COPDMonitor.Android", "files", "dataCA81BA4BDC02.csv");
+                string to = Path.Combine("storage", "emulated", "0", "Android", "data", "com.copd.COPDMonitor.Android", "files", "uploadCA81BA4BDC02.csv");
+                File.Copy(from, to);
+                File.Delete(from);
+
+                await this.LambdaFunctionDataService.PostData(this.LoginResult.AccessToken, to);
+
+                System.IO.File.Delete(to);
+            }
+            catch (Exception exept)
+            {
+                //De button is nu helemaal waardeloos, ik kijk er later na
+                Console.WriteLine(exept);
             }
         }
 
@@ -129,7 +149,7 @@ namespace LocationTest.Pages
             await this.BluetoothService.Scan();
         }
 
-        private void OnPlotButtonClick(object sender, EventArgs e)
+        private void OnButtonClicked(object sender, EventArgs e)
         {
             this.Navigation.PushAsync(new LinePlotView(this.LoginResult));
         }
