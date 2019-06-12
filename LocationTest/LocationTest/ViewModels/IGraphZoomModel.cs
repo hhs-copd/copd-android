@@ -2,6 +2,8 @@
 {
     public interface IGraphZoomModel
     {
+        string Name { get; }
+
         int Max { get; }
 
         int Min { get; }

@@ -69,7 +69,7 @@ namespace LocationTest.ViewModels
 
                 this.PlotModel = new PlotModel
                 {
-                    Title = "Data"
+                    Title = this.GraphZoomModel.Name + " Data"
                 };
 
                 DateTime startDate = DateTime.Now.AddMinutes(-30);
@@ -80,13 +80,13 @@ namespace LocationTest.ViewModels
 
                 if (this.PlotModel.Axes.Count == 0)
                 {
-                    this.PlotModel.Axes.Add(new LinearAxis() { Position = AxisPosition.Left, Minimum = GraphZoomModel.Min, Maximum = GraphZoomModel.Max, });
+                    this.PlotModel.Axes.Add(new LinearAxis() { Position = AxisPosition.Left, Minimum = this.GraphZoomModel.Min, Maximum = this.GraphZoomModel.Max, });
                     this.PlotModel.Axes.Add(new DateTimeAxis() { Minimum = minValue, Maximum = maxValue, Position = AxisPosition.Bottom, IntervalType = DateTimeIntervalType.Seconds, StringFormat = "hh:mm:ss" });
                 }
 
                 ILambdaFunctionDataService dataService = DependencyService.Get<ILambdaFunctionDataService>();
 
-                foreach (string sensor in GraphZoomModel.GraphItems)
+                foreach (string sensor in this.GraphZoomModel.GraphItems)
                 {
                     GraphResponse graph = await dataService.GetGraph(this.Token, sensor);
                     LineSeries series = this.GenerateLineSeries(sensor, graph);
