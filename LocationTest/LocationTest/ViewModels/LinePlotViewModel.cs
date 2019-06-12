@@ -61,32 +61,42 @@ namespace LocationTest.ViewModels
 
         public override async void OnAppearing(object navigationContext)
         {
-            base.OnAppearing(navigationContext);
-
-            this.PlotModel = new PlotModel
+            try
             {
-                Title = "Data",
-            };
+                base.OnAppearing(navigationContext);
 
-            var startDate = DateTime.Now.AddDays(-10);
-            var endDate = DateTime.Now;
+                this.PlotModel = new PlotModel
+                {
+                    Title = "Data"
+                };
 
-            var minValue = DateTimeAxis.ToDouble(startDate);
-            var maxValue = DateTimeAxis.ToDouble(endDate);
+                DateTime startDate = DateTime.Now.AddDays(-10);
+                DateTime endDate = DateTime.Now;
 
-            this.PlotModel.Axes.Add(new LinearAxis() { Position = AxisPosition.Left });
-            this.PlotModel.Axes.Add(new DateTimeAxis() { Minimum = minValue, Maximum = maxValue, Position = AxisPosition.Bottom });
+                double minValue = DateTimeAxis.ToDouble(startDate);
+                double maxValue = DateTimeAxis.ToDouble(endDate);
 
-            ILambdaFunctionDataService dataService = DependencyService.Get<ILambdaFunctionDataService>();
+                if (this.PlotModel.Axes.Count == 0)
+                {
+                    this.PlotModel.Axes.Add(new LinearAxis() { Position = AxisPosition.Left });
+                    this.PlotModel.Axes.Add(new DateTimeAxis() { Minimum = minValue, Maximum = maxValue, Position = AxisPosition.Bottom, IntervalType = DateTimeIntervalType.Seconds, StringFormat = "hh:mm:ss" });
+                }
 
-            foreach (var sensor in new string[] { "Temperature", "Humidity" })
-            {
-                var graph = await dataService.GetGraph(this.Token, sensor);
-                var series = this.GenerateLineSeries(sensor, graph);
-                this.PlotModel.Series.Add(series);
+                ILambdaFunctionDataService dataService = DependencyService.Get<ILambdaFunctionDataService>();
+
+                foreach (string sensor in new string[] { "Temperature", "Humidity" })
+                {
+                    GraphResponse graph = await dataService.GetGraph(this.Token, sensor);
+                    LineSeries series = this.GenerateLineSeries(sensor, graph);
+                    this.PlotModel.Series.Add(series);
+                }
+
+                this.RaisePropertyChanged();
             }
-
-            this.RaisePropertyChanged();
+            catch (Exception exception)
+            {
+                Console.WriteLine(exception);
+            }
         }
     }
 }

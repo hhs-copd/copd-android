@@ -4,6 +4,7 @@ using LocationTest.Services;
 using Newtonsoft.Json;
 using System.IO;
 using System.Net.Http;
+using System.Net.Http.Headers;
 using System.Threading.Tasks;
 using Xamarin.Forms;
 
@@ -16,31 +17,39 @@ namespace LocationTest.Droid.Services
 
         public async Task<GraphResponse> GetGraph(string accessToken, string type)
         {
-            this.HttpClient.DefaultRequestHeaders.Add("Authorization", "Bearer " + accessToken);
-            this.HttpClient.DefaultRequestHeaders.Add("X-Value", type);
-            HttpResponseMessage response = await this.HttpClient.GetAsync(LambdaConfig.RootUrl + "/graph");
-
-            response.EnsureSuccessStatusCode();
-
-            using (Stream stream = await response.Content.ReadAsStreamAsync())
-            using (StreamReader streamReader = new StreamReader(stream))
-            using (JsonTextReader reader = new JsonTextReader(streamReader))
+            using (var requestMessage = new HttpRequestMessage(HttpMethod.Get, LambdaConfig.RootUrl + "/graph"))
             {
-                JsonSerializer serializer = new JsonSerializer();
-                return serializer.Deserialize<GraphResponse>(reader);
+                requestMessage.Headers.Authorization = new AuthenticationHeaderValue("Bearer", accessToken);
+                requestMessage.Headers.Add("X-Value", type);
+                HttpResponseMessage response = await this.HttpClient.SendAsync(requestMessage);
+
+                response.EnsureSuccessStatusCode();
+
+                using (Stream stream = await response.Content.ReadAsStreamAsync())
+                using (StreamReader streamReader = new StreamReader(stream))
+                using (JsonTextReader reader = new JsonTextReader(streamReader))
+                {
+                    JsonSerializer serializer = new JsonSerializer();
+                    return serializer.Deserialize<GraphResponse>(reader);
+                }
             }
         }
 
         public async Task PostData(string accessToken, string fileLocation)
         {
-            this.HttpClient.DefaultRequestHeaders.Add("Authorization", "Bearer " + accessToken);
-
+            using (var requestMessage = new HttpRequestMessage(HttpMethod.Post, LambdaConfig.RootUrl))
             using (FileStream fileStream = File.OpenRead(fileLocation))
             using (StreamReader streamReader = new StreamReader(fileStream))
             {
                 string content = await streamReader.ReadToEndAsync();
+
                 StringContent httpContent = new StringContent(JsonConvert.SerializeObject(new { content }), System.Text.Encoding.UTF8, "application/json");
-                HttpResponseMessage response = await this.HttpClient.PostAsync(LambdaConfig.RootUrl, httpContent);
+                requestMessage.Content = httpContent;
+
+                requestMessage.Headers.Authorization = new AuthenticationHeaderValue("Bearer", accessToken);
+
+                var response = await this.HttpClient.SendAsync(requestMessage);
+
                 var body = await response.Content.ReadAsStringAsync();
                 response.EnsureSuccessStatusCode();
             }
