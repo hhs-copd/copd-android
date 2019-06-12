@@ -14,10 +14,12 @@ namespace LocationTest.ViewModels
     public class LinePlotViewModel : ViewModelBase
     {
         public string Token { get; set; }
-
         private int MarkerType = 1;
 
         private PlotModel _plotModel;
+
+        public IGraphZoomModel GraphZoomModel { get; set; }
+
         public PlotModel PlotModel
         {
             get => this._plotModel;
@@ -42,7 +44,7 @@ namespace LocationTest.ViewModels
                 Tag = name,
                 MarkerFill = OxyColor.FromRgb(50, 60, 255),
                 MarkerSize = 4,
-                MarkerType = OxyPlot.MarkerType.Circle,
+                MarkerType = OxyPlot.MarkerType.None,
                 LineStyle = LineStyle.Automatic,
                 MarkerStroke = OxyColor.FromRgb(20, 30, 255),
                 StrokeThickness = 2.0,
@@ -78,13 +80,13 @@ namespace LocationTest.ViewModels
 
                 if (this.PlotModel.Axes.Count == 0)
                 {
-                    this.PlotModel.Axes.Add(new LinearAxis() { Position = AxisPosition.Left, Minimum = 0, Maximum = 1050, });
+                    this.PlotModel.Axes.Add(new LinearAxis() { Position = AxisPosition.Left, Minimum = GraphZoomModel.Min, Maximum = GraphZoomModel.Max, });
                     this.PlotModel.Axes.Add(new DateTimeAxis() { Minimum = minValue, Maximum = maxValue, Position = AxisPosition.Bottom, IntervalType = DateTimeIntervalType.Seconds, StringFormat = "hh:mm:ss" });
                 }
 
                 ILambdaFunctionDataService dataService = DependencyService.Get<ILambdaFunctionDataService>();
 
-                foreach (string sensor in new string[] { "ThoraxCircumference","Temperature","Humidity","UVA","UVB","UVIndex", "PM10p0", "PM4p0", "PM2p5", "PM1p0", "Accelerometer-X", "Accelerometer-Y", "Accelerometer-Z", "Gyro-X", "Gyro-Y", "Gyro-Z"})
+                foreach (string sensor in GraphZoomModel.GraphItems)
                 {
                     GraphResponse graph = await dataService.GetGraph(this.Token, sensor);
                     LineSeries series = this.GenerateLineSeries(sensor, graph);

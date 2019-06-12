@@ -9,12 +9,13 @@ namespace LocationTest.Views
     [XamlCompilation(XamlCompilationOptions.Compile)]
     public partial class LinePlotView : ContentPage
     {
-        public LinePlotView(LoginResult loginResult)
+        public LinePlotView(LoginResult loginResult, IGraphZoomModel graphZoomModel)
         {
             this.InitializeComponent();
 
             var model = App.Locator.LineViewModel;
             model.Token = loginResult.AccessToken;
+            model.GraphZoomModel = graphZoomModel;
 
             this.BindingContext = model;
         }

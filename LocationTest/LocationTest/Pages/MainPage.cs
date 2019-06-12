@@ -1,4 +1,5 @@
 ﻿using LocationTest.Services;
+using LocationTest.ViewModels;
 using LocationTest.Views;
 using System;
 using System.Collections.Generic;
@@ -60,15 +61,46 @@ namespace LocationTest.Pages
 
             Button buttonPlot = new Button
             {
-                Text = "Show data graphs",
+                Text = "Show thorax",
                 HorizontalOptions = LayoutOptions.Center,
                 IsEnabled = true,
                 IsVisible = true,
                 Margin = new Thickness(00, 10, 0, 0),
                 Padding = new Thickness(32, 5)
             };
-            buttonPlot.Clicked += this.OnButtonClicked;
+            buttonPlot.Clicked += (_, __) => this.OnButtonClicked(new ThoraxZoomModel());
 
+            Button buttonUV = new Button
+            {
+                Text = "Show UV",
+                HorizontalOptions = LayoutOptions.Center,
+                IsEnabled = true,
+                IsVisible = true,
+                Margin = new Thickness(00, 10, 0, 0),
+                Padding = new Thickness(32, 5)
+            };
+            buttonUV.Clicked += (_, __) => this.OnButtonClicked(new UVZoomModel());
+
+            Button buttonPM = new Button
+            {
+                Text = "Show PM",
+                HorizontalOptions = LayoutOptions.Center,
+                IsEnabled = true,
+                IsVisible = true,
+                Margin = new Thickness(00, 10, 0, 0),
+                Padding = new Thickness(32, 5)
+            };
+            buttonPM.Clicked += (_, __) => this.OnButtonClicked(new PMZoomModel());
+            Button buttonMovement = new Button
+            {
+                Text = "Show movement",
+                HorizontalOptions = LayoutOptions.Center,
+                IsEnabled = true,
+                IsVisible = true,
+                Margin = new Thickness(00, 10, 0, 0),
+                Padding = new Thickness(32, 5)
+            };
+            buttonMovement.Clicked += (_, __) => this.OnButtonClicked(new MovementDataZoomModel());
             var buttonGrid = new Grid
             {
                 ColumnDefinitions = new ColumnDefinitionCollection
@@ -98,6 +130,9 @@ namespace LocationTest.Pages
                 {
                     Children = {
                         buttonUpload,
+                        buttonMovement,
+                        buttonPM,
+                        buttonUV,
                         buttonGrid,
                         connectedDevicesLabel,
                         this.ConnectedDevicesLayout
@@ -149,9 +184,9 @@ namespace LocationTest.Pages
             await this.BluetoothService.Scan();
         }
 
-        private void OnButtonClicked(object sender, EventArgs e)
+        private void OnButtonClicked(IGraphZoomModel model)
         {
-            this.Navigation.PushAsync(new LinePlotView(this.LoginResult));
+            this.Navigation.PushAsync(new LinePlotView(this.LoginResult,model));
         }
 
         private void UpdateDevices()

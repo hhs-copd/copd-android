@@ -23,6 +23,7 @@ namespace LocationTest.Droid.Services
                 requestMessage.Headers.Add("X-Value", type);
                 HttpResponseMessage response = await this.HttpClient.SendAsync(requestMessage);
 
+                var body = await response.Content.ReadAsStringAsync();
                 response.EnsureSuccessStatusCode();
 
                 using (Stream stream = await response.Content.ReadAsStreamAsync())
