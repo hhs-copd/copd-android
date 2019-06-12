@@ -12,12 +12,13 @@ namespace LocationTest.Droid.Services
 {
     public class LambdaFunctionDataService : ILambdaFunctionDataService
     {
+        private readonly HttpClient HttpClient = new HttpClient();
+
         public async Task<GraphResponse> GetGraph(string accessToken, string type)
         {
-            HttpClient client = new HttpClient();
-            client.DefaultRequestHeaders.Add("Authorization", "Bearer " + accessToken);
-            client.DefaultRequestHeaders.Add("X-Value", type);
-            HttpResponseMessage response = await client.GetAsync(LambdaConfig.RootUrl + "/graph");
+            this.HttpClient.DefaultRequestHeaders.Add("Authorization", "Bearer " + accessToken);
+            this.HttpClient.DefaultRequestHeaders.Add("X-Value", type);
+            HttpResponseMessage response = await this.HttpClient.GetAsync(LambdaConfig.RootUrl + "/graph");
 
             response.EnsureSuccessStatusCode();
 
@@ -32,16 +33,15 @@ namespace LocationTest.Droid.Services
 
         public async Task PostData(string accessToken, string fileLocation)
         {
-            HttpClient client = new HttpClient();
-            client.DefaultRequestHeaders.Add("Authorization", "Bearer " + accessToken);
-            client.DefaultRequestHeaders.Add("Content-Type", "application/json");
+            this.HttpClient.DefaultRequestHeaders.Add("Authorization", "Bearer " + accessToken);
 
             using (FileStream fileStream = File.OpenRead(fileLocation))
             using (StreamReader streamReader = new StreamReader(fileStream))
             {
                 string content = await streamReader.ReadToEndAsync();
-                StringContent httpContent = new StringContent(JsonConvert.SerializeObject(new { content }));
-                HttpResponseMessage response = await client.PostAsync(LambdaConfig.RootUrl, httpContent);
+                StringContent httpContent = new StringContent(JsonConvert.SerializeObject(new { content }), System.Text.Encoding.UTF8, "application/json");
+                HttpResponseMessage response = await this.HttpClient.PostAsync(LambdaConfig.RootUrl, httpContent);
+                var body = await response.Content.ReadAsStringAsync();
                 response.EnsureSuccessStatusCode();
             }
         }

@@ -46,7 +46,6 @@ namespace LocationTest.Pages
                 VerticalOptions = LayoutOptions.Center
             };
 
-
             Button buttonConnectBle = new Button
             {
                 Text = "Connect to wearable",
@@ -67,9 +66,9 @@ namespace LocationTest.Pages
                 Margin = new Thickness(00, 10, 0, 0),
                 Padding = new Thickness(32, 5)
             };
-            buttonPlot.Clicked += this.OnButtonClicked;
+            buttonPlot.Clicked += this.OnPlotButtonClick;
 
-            var buttonGrid = new Grid
+            Grid buttonGrid = new Grid
             {
                 ColumnDefinitions = new ColumnDefinitionCollection
                 {
@@ -90,7 +89,7 @@ namespace LocationTest.Pages
                 Margin = new Thickness(00, 10, 0, 0),
                 Padding = new Thickness(32, 5)
             };
-            buttonUpload.Clicked += ButtonUpload_Clicked;
+            buttonUpload.Clicked += this.ButtonUpload_Clicked;
             this.Padding = new Thickness(5, Device.RuntimePlatform == Device.iOS ? 20 : 0, 5, 0);
             this.Content = new ScrollView
             {
@@ -112,16 +111,16 @@ namespace LocationTest.Pages
             string to = Path.Combine("storage", "emulated", "0", "Android", "data", "com.copd.COPDMonitor.Android", "files", "upload.csv");
             File.Copy(from, to);
             File.Delete(from);
-            try{
 
+            try
+            {
                 await this.LambdaFunctionDataService.PostData(this.LoginResult.AccessToken, to);
-
-                System.IO.File.Delete(to);
+                File.Delete(to);
             }
             catch (Exception exept)
             {
-                //De button is nu helemaal waardeloos, ik kijk er later na
                 Console.WriteLine(exept);
+                File.Move(to, from);
             }
         }
 
@@ -130,7 +129,7 @@ namespace LocationTest.Pages
             await this.BluetoothService.Scan();
         }
 
-        private void OnButtonClicked(object sender, EventArgs e)
+        private void OnPlotButtonClick(object sender, EventArgs e)
         {
             this.Navigation.PushAsync(new LinePlotView(this.LoginResult));
         }
