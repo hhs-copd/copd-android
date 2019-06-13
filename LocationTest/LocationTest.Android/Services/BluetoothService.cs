@@ -60,7 +60,6 @@ namespace LocationTest.Droid.Services
 
         private static async void ReadData(IAdapter adapter, DeviceEventArgs args, Action<string> onConnect = null)
         {
-
             try
             {
                 if (!AllowedDevices.Any(device => args.Device.NativeDevice.ToString().StartsWith(device)))
@@ -73,38 +72,35 @@ namespace LocationTest.Droid.Services
 
                 onConnect(args.Device.Name);
 
-                foreach (IDevice dev in adapter.ConnectedDevices)
+                IList<IService> services = await args.Device.GetServicesAsync();
+                IService relevantService = services.FirstOrDefault(x => x.Id.Equals(Guid.Parse(ServiceGuid)));
+                IList<ICharacteristic> characteristics = await relevantService.GetCharacteristicsAsync();
+
+                ICharacteristic read = characteristics.FirstOrDefault(c => c.Uuid == ReadGuid);
+                ICharacteristic write = characteristics.FirstOrDefault(c => c.Uuid == WriteGuid);
+
+                if (read == null)
                 {
-                    IList<IService> services = await dev.GetServicesAsync();
-                    IService relevantService = services.FirstOrDefault(x => x.Id.Equals(Guid.Parse(ServiceGuid)));
-                    IList<ICharacteristic> characteristics = await relevantService.GetCharacteristicsAsync();
-
-                    ICharacteristic read = characteristics.FirstOrDefault(c => c.Uuid == ReadGuid);
-                    ICharacteristic write = characteristics.FirstOrDefault(c => c.Uuid == WriteGuid);
-
-                    if (read == null)
-                    {
-                        continue;
-                    }
-                    string filePath = Path.Combine("storage", "emulated", "0", "Android", "data", "com.copd.COPDMonitor.Android", "files", "data" + dev.NativeDevice.ToString().Replace(":", "") + ".csv");
-
-                    if (!File.Exists(filePath))
-                    {
-                        File.Create(filePath).Dispose();
-                    }
-
-                    read.ClearEventInvocations("ValueUpdated");
-                    read.ValueUpdated += (o, _) =>
-                    {
-                        byte[] data = read.Value;
-                        using (FileStream stream = new FileStream(filePath, FileMode.Append))
-                        {
-                            stream.Write(data, 0, data.Length);
-                        }
-                    };
-
-                    await read.StartUpdatesAsync();
+                    return;
                 }
+
+                string filePath = Path.Combine("storage", "emulated", "0", "Android", "data", "com.copd.COPDMonitor.Android", "files", "data" + args.Device.NativeDevice.ToString().Replace(":", "") + ".csv");
+
+                if (!File.Exists(filePath))
+                {
+                    File.Create(filePath).Dispose();
+                }
+
+                read.ValueUpdated += (o, _) =>
+                {
+                    byte[] data = read.Value;
+                    using (FileStream stream = new FileStream(filePath, FileMode.Append))
+                    {
+                        stream.Write(data, 0, data.Length);
+                    }
+                };
+
+                await read.StartUpdatesAsync();
             }
             catch (Exception exception)
             {
