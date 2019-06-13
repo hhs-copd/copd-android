@@ -7,7 +7,6 @@ using System;
 using System.Collections.Generic;
 using System.IO;
 using System.Linq;
-using System.Reflection;
 using System.Threading.Tasks;
 using Xamarin.Forms;
 
@@ -41,41 +40,6 @@ namespace LocationTest.Droid.Services
         public List<string> GetConnectedDevices()
         {
             return CrossBluetoothLE.Current.Adapter.ConnectedDevices.Select(device => device.Name).ToList();
-        }
-
-        private static void ClearEventInvocations(object obj, string eventName)
-        {
-            FieldInfo fi = GetEventField(obj.GetType(), eventName);
-            if (fi == null)
-            {
-                return;
-            }
-
-            fi.SetValue(obj, null);
-        }
-
-        private static FieldInfo GetEventField(Type type, string eventName)
-        {
-            FieldInfo field = null;
-            while (type != null)
-            {
-                /* Find events defined as field */
-                field = type.GetField(eventName, BindingFlags.Static | BindingFlags.Instance | BindingFlags.NonPublic | BindingFlags.Public);
-                if (field != null && (field.FieldType == typeof(MulticastDelegate) || field.FieldType.IsSubclassOf(typeof(MulticastDelegate))))
-                {
-                    break;
-                }
-
-                /* Find events defined as property { add; remove; } */
-                field = type.GetField("EVENT_" + eventName.ToUpper(), BindingFlags.Static | BindingFlags.Instance | BindingFlags.NonPublic);
-                if (field != null)
-                {
-                    break;
-                }
-
-                type = type.BaseType;
-            }
-            return field;
         }
 
         public void Listen(BluetoothHandler handler = null)
@@ -129,10 +93,9 @@ namespace LocationTest.Droid.Services
                         File.Create(filePath).Dispose();
                     }
 
-                    ClearEventInvocations(read, "ValueUpdated");
+                    read.ClearEventInvocations("ValueUpdated");
                     read.ValueUpdated += (o, _) =>
                     {
-
                         byte[] data = read.Value;
                         using (FileStream stream = new FileStream(filePath, FileMode.Append))
                         {
