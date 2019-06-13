@@ -75,7 +75,6 @@
     <Compile Include="Services\AuthenticationService.cs" />
     <Compile Include="Services\BluetoothService.cs" />
     <Compile Include="LoginActivity.cs" />
-    <Compile Include="Services\ClearInvocations.cs" />
     <Compile Include="Services\LambdaFunctionDataService.cs" />
     <Compile Include="Services\PermissionService.cs" />
     <Compile Include="Resources\Resource.designer.cs" />

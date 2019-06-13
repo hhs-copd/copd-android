@@ -4,6 +4,7 @@ using LocationTest.Views;
 using System;
 using System.Collections.Generic;
 using System.IO;
+using System.Threading.Tasks;
 using Xamarin.Forms;
 
 namespace LocationTest.Pages
@@ -169,6 +170,7 @@ namespace LocationTest.Pages
 
         private async void ButtonUpload_Clicked(object sender, EventArgs e)
         {
+            Console.WriteLine("Uploading data...");
             this.UploadButton.IsEnabled = false;
             this.UploadButton.Text = "Uploading...";
 
@@ -185,11 +187,15 @@ namespace LocationTest.Pages
 
                     File.Delete(to);
                 }
+
+                Console.WriteLine("Uploaded data.");
             }
             catch (Exception exept)
             {
-                //De button is nu helemaal waardeloos, ik kijk er later na
+                Console.WriteLine("Failed uploading data:");
                 Console.WriteLine(exept);
+                this.UploadButton.Text = "Failed uploading data";
+                await Task.Delay(3000);
             }
 
             try
@@ -205,11 +211,15 @@ namespace LocationTest.Pages
 
                     File.Delete(to);
                 }
+
+                Console.WriteLine("Uploaded data.");
             }
             catch (Exception exept)
             {
-                //De button is nu helemaal waardeloos, ik kijk er later na
+                Console.WriteLine("Failed uploading data:");
                 Console.WriteLine(exept);
+                this.UploadButton.Text = "Failed uploading data";
+                await Task.Delay(3000);
             }
 
             this.UploadButton.IsEnabled = true;
