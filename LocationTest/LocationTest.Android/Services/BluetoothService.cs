@@ -98,6 +98,7 @@ namespace LocationTest.Droid.Services
                     {
                         File.Create(filePath).Dispose();
                     }
+                    
                     read.ValueUpdated += (o, _) =>
                     {
                         

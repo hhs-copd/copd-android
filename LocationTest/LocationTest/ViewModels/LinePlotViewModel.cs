@@ -72,8 +72,8 @@ namespace LocationTest.ViewModels
                     Title = this.GraphZoomModel.Name + " Data"
                 };
 
-                DateTime startDate = DateTime.Now.AddMinutes(-30);
-                DateTime endDate = DateTime.Now.AddMinutes(0);
+                DateTime startDate = DateTime.Now.AddSeconds(-900);
+                DateTime endDate = DateTime.Now.AddSeconds(-600);
 
                 double minValue = DateTimeAxis.ToDouble(startDate);
                 double maxValue = DateTimeAxis.ToDouble(endDate);
@@ -81,7 +81,7 @@ namespace LocationTest.ViewModels
                 if (this.PlotModel.Axes.Count == 0)
                 {
                     this.PlotModel.Axes.Add(new LinearAxis() { Position = AxisPosition.Left, Minimum = this.GraphZoomModel.Min, Maximum = this.GraphZoomModel.Max, });
-                    this.PlotModel.Axes.Add(new DateTimeAxis() { Minimum = minValue, Maximum = maxValue, Position = AxisPosition.Bottom, IntervalType = DateTimeIntervalType.Seconds, StringFormat = "hh:mm:ss" });
+                    this.PlotModel.Axes.Add(new DateTimeAxis() { Key = "time", Minimum = minValue, Maximum = maxValue, Position = AxisPosition.Bottom, IntervalType = DateTimeIntervalType.Seconds, StringFormat = "hh:mm:ss", IntervalLength =1800});
                 }
 
                 ILambdaFunctionDataService dataService = DependencyService.Get<ILambdaFunctionDataService>();
@@ -92,7 +92,8 @@ namespace LocationTest.ViewModels
                     LineSeries series = this.GenerateLineSeries(sensor, graph);
                     this.PlotModel.Series.Add(series);
                 }
-
+               
+                
                 this.RaisePropertyChanged();
             }
             catch (Exception exception)
